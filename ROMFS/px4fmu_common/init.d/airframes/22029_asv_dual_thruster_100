@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# @name Generic Dual-Thruster 100%
+#
+# @type Boat
+# @class Boat
+#
+# @output MAIN1 rightthruster
+# @output MAIN2 leftthruster
+#
+
+. ${R}etc/init.d/rc.boat_defaults
+
+# define the number of cells the attached battery consists of
+param set-default BAT1_N_CELLS 3
+
+# define required number of redundant power modules
+param set-default COM_POWER_COUNT 0
+
+# define PWM ranges
+param set-default PWM_MAIN_DISARM 1500       # 1500us stopped
+param set-default PWM_MAIN_MAX 2000          # 2000us max forward thrust
+param set-default PWM_MAIN_MIN 1000          # 1000us max backward thrust
+
+# set MAVLink airframe type
+set MAV_TYPE 11                                 # surface vessel, boat, ship
+
+# set mixer
+set MIXER asv_dual_thruster_100

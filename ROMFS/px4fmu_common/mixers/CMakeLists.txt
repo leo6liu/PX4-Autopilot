@@ -90,4 +90,8 @@ px4_add_romfs_files(
 	vtol_convergence.main.mix
 	vtol_delta.aux.mix
 	vtol_tailsitter_duo.main.mix
+
+	asv_dual_thruster_030.main.mix
+	asv_dual_thruster_100.main.mix
+	asv_dual_thruster_roll.main.mix
 )

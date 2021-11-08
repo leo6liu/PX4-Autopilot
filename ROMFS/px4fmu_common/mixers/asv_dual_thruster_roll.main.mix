@@ -1,0 +1,25 @@
+Generic Dual-Thruster Aquatic Surface Vehicle (ASV) Roll
+=======================================
+
+This mixer is suitable for controlling any differential-drive ASV. That is,
+an ASV where the left thruster and right thruster are driven independently,
+allowing turning in place. It outputs to channels 2 (right thruster) and
+4 (left thruster)
+
+Inputs to the mixer come from control group 0 (flight control), channels 0
+(roll) and 3 (thrust).
+
+
+Output 1: right thruster
+---------------------------------------
+M: 2
+O:        10000   10000      0  -10000  10000
+S: 0 0   -10000  -10000      0  -10000  10000
+S: 0 3    10000   10000      0  -10000  10000
+
+Output 2: left thruster
+---------------------------------------
+M: 2
+O:        10000   10000      0  -10000  10000
+S: 0 0    10000   10000      0  -10000  10000
+S: 0 3    10000   10000      0  -10000  10000

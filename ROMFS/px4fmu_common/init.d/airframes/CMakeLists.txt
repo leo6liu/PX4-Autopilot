@@ -158,6 +158,10 @@ px4_add_romfs_files(
 
 	# [22000, 22999] Reserve for custom models
 
+	22028_asv_dual_thruster_030 # 30% power
+	22029_asv_dual_thruster_100 # 30% power
+	22030_asv_dual_thruster_roll # roll is used as the yaw input
+
 	24001_dodeca_cox
 
 	50000_generic_ground_vehicle
