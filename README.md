@@ -4,7 +4,49 @@ This repository was forked on v1.12.3 for development of Temple University Depar
 
 ## How to add a new "boat-frame"
 
-populate instructions here...
+The primary source for these instructions are provided on the PX4 offical docs: [Adding a New Airframe Configuration](https://docs.px4.io/master/en/dev_airframes/adding_a_new_frame.html).
+
+The following steps demonstrate how to create the Aquatic Surface Vehicle (ASV) Dual-Thruster 30% power boat-frame and compile it using the PX4 stack.
+
+1. Create the configuration file. This file sets the name and frame type, sets custom parameters, and specifies the mixer file.
+    - Create the file: `22028_asv_dual_thruster_030` in the `PX4-Autopilot/ROMFS/px4fmu_common/init.d/airframes` directory (It is convention to prepend custom config files with a number in the range: [22000, 22999]).
+    - The full config file for the ASV Dual-Thruster 30% can be seen here: [`22028_asv_dual_thruster_030`](ROMFS/px4fmu_common/init.d/airframes/22028_asv_dual_thruster_030)
+    - The @name in the header sets the name of the boat frame which will appear in the QGC airframes menu.
+    - The @type and @class in the header sets the type and class of airframe. In this case both are set to Boat so they will show up under the Boat catagory in the QGC airframes menu.
+    - `. ${R}etc/init.d/rc.boat_defaults` This line calls some PX4 defaults for boat frames.
+    - The `PWM_MAIN_DISARM`, `MAX`, and `MIN` define the main PWM ranges which will be used by the MAIN outputs. Units are in microseconds (μs).
+    - `set MIXER asv_dual_thruster_030` This line specified the mixer file which should be used by this boat frame. The mixer file specifies how input signals (i.e. Roll, Pitch, Yaw, Throttle) should effect the output channels.
+2. Add the configuration file to the airframes CMakeLists.txt.
+    - Add the line `22028_asv_dual_thruster_030` under the `# [22000, 22999] Reserve for custom models` heading in [`ROMFS/px4fmu_common/init.d/airframes/CMakeLists.txt`](ROMFS/px4fmu_common/init.d/airframes/CMakeLists.txt)
+3. Create the mixer file. This file specifies how input signals (i.e. Roll, Pitch, Yaw, Throttle) should effect the output channels.
+    - Create the file: `asv_dual_thruster_030.main.mix` in the `PX4-Autopilot/ROMFS/px4fmu_common/mixers` directory (It is convention to prepend custom config files with a number in the range: [22000, 22999]).
+    - The full mixer file for the ASV Dual-Thruster 30% can be seen here: [`asv_dual_thruster_030.main.mix`](ROMFS/px4fmu_common/mixers/asv_dual_thruster_030.main.mix)
+    - Additional documentation on mixer files can be found here: [Mixing and Actuators](https://docs.px4.io/master/en/concept/mixing.html)
+    - Only lines that begin with a capital letter followed by a colon are processed (e.g. `M:`, `O:`, `S:`). All other lines can be used for commenting and documentation.
+    - The mixer file is made up of several mixers. There are four types of mixers: `R:` Multirover, `H:` Helicopter, `M:` Summing, `Z:` Null. Multiple mixers can be specified in a single mixer file. The outputs correspond to the order in which the mixers are specified in the file (e.g. "if you define a multi-rotor mixer for a quad geometry, followed by a null mixer, followed by two summing mixers then this would allocate the first 4 outputs to the quad, an "empty" output, and the next two outputs.").
+    - Our mixer is for a dual thruster boat, so there should be two outputs. The first will be for the right thruster and the second for the left thruster.
+    - The right thruster will use a summing mixer, meaning zero or more control inputs will control a single actuator output. Further documentation on summing mixers can be found here: [Summing Mixer](https://docs.px4.io/master/en/concept/mixing.html#summing-mixer).
+    - Here is a line by line explanation of the summing mixer used for the right thruster:
+
+The following two lines do not begin with a capital letter followed by a colon, so they are ignored.
+
+`Output 1: right thruster`
+
+`---------------------------------------`
+
+This is the first mixer specifed in the file. As it is a summing mixer (`M:`), it will control a single output (main PWM output 1). The `2` indicates that it reads two control inputs. This requires two `S:` statements to appear in this mixer block.
+
+`M: 2`
+
+The `O:` defines the output scaler. Values are scaled by a factor of 10000, so 3000 would correspond to a scale value of 0.3. The first 3000 indicates we want a 0.3 scaling on negative output. The second 3000 indicates we want a 0.3 scaling on positive output. The 0 specifies an offset of 0. The -10000 indiates the lower limit is -1.0 and the 10000 indiates the upper limit is 1.0.
+
+`O:         3000    3000      0  -10000  10000`
+
+The `S:` defines the output behavior for the first control input. The 0 indiates the input is from [Control Group #0 (Flight Control)](https://docs.px4.io/master/en/concept/mixing.html#control-group-0-flight-control). The 2 indates channel 2 which corresponds 
+
+`S: 0 2   -10000  -10000      0  -10000  10000`
+
+`S: 0 3    10000   10000      0  -10000  10000`
 
 ## General Information
 
