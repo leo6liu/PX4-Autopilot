@@ -2,6 +2,38 @@
 
 This repository was forked on v1.12.3 for development of Temple University Department of Engineering's Roboboat Senior Design Project (FALL 2021).
 
+## How to setup the development environment
+
+*Note: this is only a suggested build environment. Any text editor and container runtime has the potential to work.*
+
+- install [VS Code](https://code.visualstudio.com/)
+    - installed the [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
+- install [Docker Desktop](https://www.docker.com/products/docker-desktop)
+- install [Git](https://git-scm.com/downloads) *(git on WSL, macOS, and Linux will also work. GitHub Desktop WILL NOT WORK because it does not perform a recursive clone.)*
+- install [QGroundControl](http://qgroundcontrol.com/downloads/)
+
+1. Download the source code using the command: `git clone https://github.com/leo6liu/PX4-Autopilot.git --recursive`
+2. Start Docker Desktop (or your container runtime of choice)
+3. Open the PX4-Autopilot directory in VS Code
+    - Do not install any suggested extensions at this time
+    - There will be a notification in the bottom-right prompting you to `Reopen in Container`
+      ![image](https://user-images.githubusercontent.com/46534486/142738240-c240856f-8efe-4302-8661-3a0ee84c0d44.png)
+    - Click `Reopen in Container`
+4. Once VS Code reopens in the container environment, it will install all the recommended extensions into the container and begin to configure the project using the CMake Tools extension.
+5. Click the CMake Target target on the VS Code bottom taskbar. This will open a menu where you can select your build target (e.g. to build for Pixhawk 4, select px4_fmu-v5_default).
+   ![image](https://user-images.githubusercontent.com/46534486/142738772-7b4fdf5d-c0a5-4657-afa1-e6780fc5b917.png)
+6. Wait for the `Configuring Project: Configuring Project` notification from CMake Tools to finish (this could take several minutes on slower systems).
+7. Click on the Terminal tab in VS Code and execute the following command: `make clean`
+8. Execute the following command for the intended build target: `make px4_fmu-v5_default`
+   *Note: each build must `make clean` before `make <target>`*
+9. Wait for the build process to complete (this could take several minutes on slower systems).
+10. In the VS Code file "Explorer" menu, navigate to the build/<target> directory (e.g. build/px4_fmu-v5_default).
+11. Find the <target>.px4 file (e.g. px4_fmu-v5_default.px4), right click it, then Download it onto your computer.
+12. Launch QGroundControl with a Pixhawk connected.
+13. Navigate to the Firmware tab under Vehicle Configuration.
+14. Follow the firmware flashing steps, selecting a custom firmware file. The file that should be loaded is the downloaded <target>.px4 file from above.
+15. If a new "boat-frame" was added, relaunch QGroundControl, and it should appear in the Airframes tab.
+
 ## How to add a new "boat-frame"
 
 The primary source for these instructions are provided on the PX4 offical docs: [Adding a New Airframe Configuration](https://docs.px4.io/master/en/dev_airframes/adding_a_new_frame.html).
@@ -42,12 +74,19 @@ The `O:` defines the output scaler. Values are scaled by a factor of 10000, so 3
 
 `O:         3000    3000      0  -10000  10000`
 
-The `S:` defines the output behavior for the first control input. The 0 indiates the input is from [Control Group #0 (Flight Control)](https://docs.px4.io/master/en/concept/mixing.html#control-group-0-flight-control). The 2 indates channel 2 which corresponds 
+The `S:` defines the output behavior for a control signal input. The 0 indiates the signal is from [Control Group #0 (Flight Control)](https://docs.px4.io/master/en/concept/mixing.html#control-group-0-flight-control). The 2 indates channel 2 which corresponds to Yaw. The next two values correspond to behavior to negative and positive yaw signals. For this dual-thruster design we specify a negative value for negative yaw (turn left) inputs so that the right motor thrusts forwards (neg * neg = pos). We specify a negative value for positive yaw (turn right) inputs so that the right motor thrusts backwards (pos * neg = neg). The next 0 indicates we want an offset of 0. The -10000 and 10000 indicate that we want the full possible range of outputs (-1 to 1) (no cuttoffs).
 
 `S: 0 2   -10000  -10000      0  -10000  10000`
+    
+The next `S:` defines output behavior for the next control signal input. This time the 3 corresponds to Throttle. The next two values correspond to behavior to negative and positive throttle signals. For this dual-thruster we specify a positive value for negative throttle (translate backward) inputs so that the right motor thrusts backwards (neg * pos = neg). We specify a positive value for positive throttle (translate forward) inputs so that the right motor thrusts forwards (pos * pos = pos). Again, we want no offset value and a full range of outputs.
 
 `S: 0 3    10000   10000      0  -10000  10000`
 
+4. Add the mixer file to the mixers CMakeLists.txt.
+    - Add the line `asv_dual_thruster_030.main.mix` to the end of the list of current mixers [`ROMFS/px4fmu_common/mixers/CMakeLists.txt`](ROMFS/px4fmu_common/mixers/CMakeLists.txt)
+5. Compile the PX4 stack to generate a .px4 file as specified in the "How to setup the development environment" section above.
+    - `make clean` then `make <target>` (e.g. `make px4_fmu-v5_default` for Pixhawk 4)
+    
 ## General Information
 
 Reach out to the responsive PX4 community on Slack:
