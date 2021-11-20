@@ -20,18 +20,18 @@ This repository was forked on v1.12.3 for development of Temple University Depar
       ![image](https://user-images.githubusercontent.com/46534486/142738240-c240856f-8efe-4302-8661-3a0ee84c0d44.png)
     - Click `Reopen in Container`
 4. Once VS Code reopens in the container environment, it will install all the recommended extensions into the container and begin to configure the project using the CMake Tools extension.
-5. Click the CMake Target target on the VS Code bottom taskbar. This will open a menu where you can select your build target (e.g. to build for Pixhawk 4, select px4_fmu-v5_default).
+5. Click the CMake Target target on the VS Code bottom taskbar. This will open a menu where you can select your build target (e.g. to build for Pixhawk 4, select `px4_fmu-v5_default`).
    ![image](https://user-images.githubusercontent.com/46534486/142738772-7b4fdf5d-c0a5-4657-afa1-e6780fc5b917.png)
 6. Wait for the `Configuring Project: Configuring Project` notification from CMake Tools to finish (this could take several minutes on slower systems).
 7. Click on the Terminal tab in VS Code and execute the following command: `make clean`
 8. Execute the following command for the intended build target: `make px4_fmu-v5_default`
    *Note: each build must `make clean` before `make <target>`*
 9. Wait for the build process to complete (this could take several minutes on slower systems).
-10. In the VS Code file "Explorer" menu, navigate to the build/<target> directory (e.g. build/px4_fmu-v5_default).
-11. Find the <target>.px4 file (e.g. px4_fmu-v5_default.px4), right click it, then Download it onto your computer.
+10. In the VS Code file "Explorer" menu, navigate to the `build/<target>` directory (e.g. `build/px4_fmu-v5_default`).
+11. Find the `<target>.px4` file (e.g. `px4_fmu-v5_default.px4`), right click it, then Download it onto your computer.
 12. Launch QGroundControl with a Pixhawk connected.
 13. Navigate to the Firmware tab under Vehicle Configuration.
-14. Follow the firmware flashing steps, selecting a custom firmware file. The file that should be loaded is the downloaded <target>.px4 file from above.
+14. Follow the firmware flashing steps, selecting a custom firmware file. The file that should be loaded is the downloaded `<target>.px4` file from above.
 15. If a new "boat-frame" was added, relaunch QGroundControl, and it should appear in the Airframes tab.
 
 ## How to add a new "boat-frame"
